@@ -7,9 +7,9 @@ $.ajax({
 function successFunction(data) {
   var datosFila = data.split("\n");
   var infoJuegos = [];
-  var ingredientes;
+  var indexJuegos;
 
-  ingredientes = datosFila[0].split(",");
+  indexJuegos = datosFila[0].split(",");
 
   for (let index = 1; index < datosFila.length; index++) {
     //Lectura de una linea
@@ -51,9 +51,9 @@ function successFunction(data) {
     var datosFila = data.split("\n");
 
     var infoSnacks = [];
-    var bebidasTitle;
+    var indexSnacks;
 
-    bebidasTitle = datosFila[0].split(",");
+    indexSnacks = datosFila[0].split(",");
 
     for (let index = 1; index < datosFila.length; index++) {
       //Lectura de una linea
@@ -86,6 +86,87 @@ function successFunction(data) {
     }
 
     console.log(infoJuegos);
-    console.log(infoSnacks);
+    //console.log(infoSnacks);
+
+    //Logica
+    var infoGroups = setDataInGroups(infoJuegos);
+    var misseryList = getLeastMisseryList(infoGroups[1], indexJuegos);
+    getValuesFromLeastMisseryList(infoGroups[1], misseryList);
+
+
+    //Funciones
+    function setDataInGroups(array) {
+      var newArray = [];
+      array.sort((a, b) => {
+        if (a.Grupo < b.Grupo) { return -1 }
+        if (a.Grupo > b.Grupo) { return 1 }
+        return 0;
+      });
+
+      for (let i = 0; i < array[array.length - 1].Grupo + 1; i++) {
+        newArray[i] = [];
+      }
+
+      for (let i = 0; i < array.length; i++) {
+        newArray[array[i].Grupo].push(array[i]);
+      }
+      console.log(newArray);
+      return newArray
+    }
+    
+    function getLeastMisseryList(list, keys) {
+      // Se sacaran las bebidas mas "miserables"
+      let misseryList = [];
+      // Primero recorremos los vecinos de bebidas
+      list.forEach(neighbour => {
+          // Luego se recorren las bebidas para encontrar las mas miserables
+          keys.forEach(drink => {
+              if (neighbour[drink] < 5) {
+                  // Si es menor a 5, se buscara esa bebida en la lista de bebidas mas miserables
+                  let temp = misseryList.find(elem => {
+                      return elem === drink;
+                  })
+                  // Si la bebida no esta en la lista de bebidas miserables, la agregara
+                  if (!temp) {
+                      misseryList.push(drink);
+                  }
+              }
+          })
+      });
+      // Se duplica la lista de bebidas
+      let leastMisseryList = [...keys];
+      // Ahora se eliminan las menos favoritas
+      misseryList.forEach(elem => {
+          let deleteDrinkIndex = leastMisseryList.indexOf(elem);
+          leastMisseryList.splice(deleteDrinkIndex, 1);
+      });
+      // Retorna la lista de bebidas menos misrebales
+      console.log(leastMisseryList);
+      return leastMisseryList;
+  }
+
+    function getValuesFromLeastMisseryList(array, keys) {
+      var groupValues= [];
+      for (let i = 0; i < array[array.length - 1].Grupo + 2; i++) {
+        groupValues[i] = [];
+      }
+      console.log(groupValues);
+      for (let i = 0; i < array.length; i++) {
+        Object.entries(array[i]).forEach(([key, value]) => {
+          for (let i2 = 0; i2 < keys.length; i2++) {
+            if (keys[i2] == String(key)) {
+              console.log(key,value);
+              groupValues[i].push([key,value]);
+            }
+            
+          }
+        });
+
+      }
+      console.log(groupValues);
+      return groupValues
+    }
+
+
   }
 }

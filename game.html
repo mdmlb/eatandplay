@@ -31,22 +31,31 @@
     </header>
 
     <main class="mr-auto p-2 bd-highlight mainCont">
-        <div class="container align-items-center mainCont__form" style="padding: 0%;">
-            <iframe
-                src="https://docs.google.com/forms/d/e/1FAIpQLSebEqEhC0beqvpQbOCy97EAlyK2AEnsrs0vdFHXF3gTqHxZaQ/viewform?embedded=true"
-                width="352" height="4508" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>
-        </div>
+        <form class="info">
+            
+            <div class="container align-items-center mainCont__form" style="padding: 0%; flex-direction: column;">
 
-        <div class="col p-2 d-flex justify-content-center align-items-center">
-            <h6 style="text-align: center; margin-bottom: 15px;">Al completar y enviar el forms da siguiente para
-                recomendarte el juego</h6>
-            <div class="col d-flex justify-content-center align-items-center" style="text-align: center;">
-                <a href="">
-                    <button type="button" class="btn btnGames p-2">Continuar</button>
-                </a>
+                <div class="p-3" style="justify-content: left; width: 100%;">
+                    <label for="inputState" style="color: white;">Nombre y Apellido</label>
+                    <input type="text" class="form-control info__Nombre" placeholder="Digite nombre y apellido">
+                </div>
 
+                <iframe
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSebEqEhC0beqvpQbOCy97EAlyK2AEnsrs0vdFHXF3gTqHxZaQ/viewform?embedded=true"
+                    width="352" height="4508" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>
             </div>
-        </div>
+
+            <div class="col p-2 d-flex justify-content-center align-items-center">
+                <h6 style="text-align: center; margin-bottom: 15px;">Al completar y enviar el forms da siguiente para
+                    recomendarte el juego</h6>
+                <div class="col d-flex justify-content-center align-items-center" style="text-align: center;">
+                    <a href="">
+                        <button type="button" class="btn btnGames p-2">Continuar</button>
+                    </a>
+
+                </div>
+            </div>
+        </form>
     </main>
 
 
