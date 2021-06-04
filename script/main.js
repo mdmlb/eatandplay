@@ -106,12 +106,67 @@ function successFunction(data) {
     //console.log(recommendation);
     var topThree = recommendation.slice(recommendation.length-3,recommendation.length)
     console.log(topThree);  */
-
-    var test = setDataInGroups(infoJuegos);
-    var test2 = transformGroupObjectsToGroupArrays(test[18]);
-    getAverageOfGroup(test2);
+    
+    console.log(setGroupsDataInArrays('juegos'));
+    var test1 = setGroupsDataInArrays('juegos');
+    //magnitud(test1[1]);
+    //productoPunto(test1[0], test1[1])
+    for (let i = 0; i < test1.length; i++) {
+      console.log(similCoseno(test1[1], test1[i]));
+    }
+    
 
     //Funciones
+
+    function similCoseno(grupo1, grupo2) {
+      let result = 0;
+      result = (productoPunto(grupo1, grupo2)) / ((magnitud(grupo1))*(magnitud(grupo2)));
+      //console.log(result);
+      return result;
+    }
+
+    function productoPunto(grupo1, grupo2) {
+      var newValue = 0;
+      //console.log(grupo1, grupo2);
+      for (let i = 2; i < grupo1.length; i++) {
+        //console.log(grupo1[i][1]*grupo2[i][1]);
+        newValue += (grupo1[i][1]*grupo2[i][1]);
+      }
+      //console.log(newValue);
+      return newValue
+    }
+
+    function magnitud(grupo) {
+      //console.log(grupo);
+      var newValue = 0;
+      for (let i = 2; i < grupo.length; i++) {
+        //console.log(grupo[i]);
+        let newVal = (grupo[i][1]*grupo[i][1]);
+        newValue+= newVal;
+      }
+      //console.log(Math.sqrt(newValue));
+      return Math.sqrt(newValue);
+    }
+
+    function setGroupsDataInArrays(tipo) {
+      var infoDB;
+      switch (tipo) {
+        case 'juegos':
+          infoDB = infoJuegos;
+          break;
+      
+        case 'snacks':
+          infoDB = infoSnacks;
+          break;
+      }
+      var infoGroupsObjects = setDataInGroups(infoDB);
+      var infoGroupsArrays = [];
+    for (let i = 1; i < infoGroupsObjects.length; i++) {
+      let item = transformGroupObjectsToGroupArrays(infoGroupsObjects[i]);
+      infoGroupsArrays.push(getAverageOfGroup(item));
+    }
+    return infoGroupsArrays;
+    }
 
     function transformGroupObjectsToGroupArrays(array) {
       //console.log(array);
@@ -132,7 +187,7 @@ function successFunction(data) {
     }
 
     function getAverageOfGroup(array) {
-      console.log(array);
+      //console.log(array);
       let newArray = [];
       for (let i = 1; i < array[array.length-1].length ; i++) {
         newArray[i] = [];
@@ -144,13 +199,13 @@ function successFunction(data) {
         
         for (let i2 = 1; i2 < array.length; i2++) {
           //console.log(array[i2][i][1]);
-          newValue+= array[i2][i][1];        
+          newValue+= parseInt(array[i2][i][1]);        
         }   
         newArray[i].push(newValue/(array.length-1));
       }
       
       newArray[1].push("Grupo", array[array.length-1][1][1])
-      console.log(newArray);
+      //console.log(newArray);
       return newArray
     }
 
