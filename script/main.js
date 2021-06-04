@@ -102,12 +102,13 @@ function successFunction(data) {
     //Logica
 
     //Con este bloque de codigo se consigue el top 3 de algo
-    /* var recommendation = getRecommendationWithLeastMisseryMethod(7, 'snacks');
+    /* var recommendation = getRecommendationWithLeastMisseryMethod(18, 'snacks');
+    //console.log(recommendation);
     var topThree = recommendation.slice(recommendation.length-3,recommendation.length)
     console.log(topThree);  */
 
     var test = setDataInGroups(infoJuegos);
-    var test2 = transformGroupObjectsToGroupArrays(test[1]);
+    var test2 = transformGroupObjectsToGroupArrays(test[18]);
     getAverageOfGroup(test2);
 
     //Funciones
@@ -142,7 +143,7 @@ function successFunction(data) {
         newArray[i].push(array[array.length-1][i][0]);
         
         for (let i2 = 1; i2 < array.length; i2++) {
-          console.log(array[i2][i][1]);
+          //console.log(array[i2][i][1]);
           newValue+= array[i2][i][1];        
         }   
         newArray[i].push(newValue/(array.length-1));
@@ -193,15 +194,26 @@ function successFunction(data) {
 
     function setDataInGroups(array) {
       var newArray = [];
+      var grupo = 1;
       array.sort((a, b) => {
         if (a.Grupo < b.Grupo) { return -1 }
         if (a.Grupo > b.Grupo) { return 1 }
         return 0;
       });
 
-      for (let i = 1; i < array[array.length - 1].Grupo + 1; i++) {
-        newArray[i] = [];
+      for (let i = 0; i < array.length; i++) {
+        //console.log(array[i].Grupo);
+        if (array[i+1]) {
+          if (array[i].Grupo !== array[i+1].Grupo) {
+            grupo++;
+          }
+        }
       }
+      //console.log(grupo);
+
+       for (let i = 1; i < grupo + 1; i++) {
+        newArray[i] = [];
+      } 
 
       for (let i = 0; i < array.length; i++) {
         newArray[array[i].Grupo].push(array[i]);
