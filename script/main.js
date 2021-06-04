@@ -73,15 +73,15 @@ function successFunction(data) {
         SalchichonConPapa: arregloDeLista[11],
         PizzaJamonQueso: arregloDeLista[12],
         SalchipapaClasica: arregloDeLista[13],
-        SalchipapaEspecial: arregloDeLista[13],
-        DedoDeQueso: arregloDeLista[13],
-        Ensalada: arregloDeLista[13],
-        Donas: arregloDeLista[13],
-        TortaDeQueso: arregloDeLista[13],
-        Muffins: arregloDeLista[13],
-        RollosDeCanela: arregloDeLista[13],
-        MousseChocolate: arregloDeLista[13],
-        Tiramisu: arregloDeLista[13],
+        SalchipapaEspecial: arregloDeLista[14],
+        DedoDeQueso: arregloDeLista[15],
+        Ensalada: arregloDeLista[16],
+        Donas: arregloDeLista[17],
+        TortaDeQueso: arregloDeLista[18],
+        Muffins: arregloDeLista[19],
+        RollosDeCanela: arregloDeLista[20],
+        MousseChocolate: arregloDeLista[21],
+        Tiramisu: arregloDeLista[22],
       });
     }
 
@@ -97,11 +97,61 @@ function successFunction(data) {
     
     //console.log(infoJuegos);
     //console.log(infoSnacks);
+
+
     //Logica
 
-  console.log(getRecommendationWithLeastMisseryMethod(2, 'juegos')); 
+    //Con este bloque de codigo se consigue el top 3 de algo
+    /* var recommendation = getRecommendationWithLeastMisseryMethod(7, 'snacks');
+    var topThree = recommendation.slice(recommendation.length-3,recommendation.length)
+    console.log(topThree);  */
+
+    var test = setDataInGroups(infoJuegos);
+    var test2 = transformGroupObjectsToGroupArrays(test[1]);
+    getAverageOfGroup(test2);
 
     //Funciones
+
+    function transformGroupObjectsToGroupArrays(array) {
+      //console.log(array);
+      let newArray = [];
+      for (let i = 1; i < array.length + 1; i++) {
+        newArray[i] = [];
+      }
+      for (let i = 0; i < array.length; i++) {
+        //console.log(array[i]);
+        Object.entries(array[i]).forEach(([key, value]) => {
+          //console.log(newArray);
+          //console.log(newArray[array[i].Grupo]);
+          newArray[i+1].push([key,value])
+        });
+      }
+      //console.log(newArray);
+      return newArray
+    }
+
+    function getAverageOfGroup(array) {
+      console.log(array);
+      let newArray = [];
+      for (let i = 1; i < array[array.length-1].length ; i++) {
+        newArray[i] = [];
+      }
+      
+      for (let i = 2; i < array[array.length-1].length ; i++) {
+        let newValue = 0;
+        newArray[i].push(array[array.length-1][i][0]);
+        
+        for (let i2 = 1; i2 < array.length; i2++) {
+          console.log(array[i2][i][1]);
+          newValue+= array[i2][i][1];        
+        }   
+        newArray[i].push(newValue/(array.length-1));
+      }
+      
+      newArray[1].push("Grupo", array[array.length-1][1][1])
+      console.log(newArray);
+      return newArray
+    }
 
     function getRecommendationWithLeastMisseryMethod(grupo, tipo) { 
       var infoGroups;
@@ -120,14 +170,25 @@ function successFunction(data) {
           genInfo = infoSnacks;
           break;
       }
-      //console.log(infoGroups);
+      console.log(infoGroups);
       var misseryListIndex = getLeastMisseryList(infoGroups[grupo], index);
       console.log(misseryListIndex);
       var misseryListValues = getValuesFromLeastMisseryList(infoGroups[grupo], misseryListIndex);
-      //console.log(misseryListIndex);
+      console.log(misseryListValues);
       var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, genInfo);
       //console.log(resultsMisseryValuesAverage);
-      return resultsMisseryValuesAverage
+      var result = [];
+      result.push(resultsMisseryValuesAverage[0]);
+      resultsMisseryValuesAverage.shift();
+      resultsMisseryValuesAverage.sort((a, b) => {
+        if (a[1] < b[1]) { return -1 }
+        if (a[1] > b[1]) { return 1 }
+        return 0;
+      });
+      for (let i = 0; i < resultsMisseryValuesAverage.length; i++) {
+        result.push(resultsMisseryValuesAverage[i]); 
+      }
+      return result
     }
 
     function setDataInGroups(array) {
@@ -138,7 +199,7 @@ function successFunction(data) {
         return 0;
       });
 
-      for (let i = 0; i < array[array.length - 1].Grupo + 1; i++) {
+      for (let i = 1; i < array[array.length - 1].Grupo + 1; i++) {
         newArray[i] = [];
       }
 
@@ -150,24 +211,24 @@ function successFunction(data) {
     }
     
     function getLeastMisseryList(list, keys) {
-      console.log(list,keys);
+      //console.log(list,keys);
       // Se sacaran las bebidas mas "miserables"
       let misseryList = [];
       // Primero recorremos los vecinos de bebidas
       list.forEach(neighbour => {
           // Luego se recorren las bebidas para encontrar las mas miserables
-          keys.forEach(drink => {
-              if (neighbour[drink] < 5) {
-                  // Si es menor a 5, se buscara esa bebida en la lista de bebidas mas miserables
-                  let temp = misseryList.find(elem => {
-                      return elem === drink;
-                  })
-                  // Si la bebida no esta en la lista de bebidas miserables, la agregara
-                  if (!temp) {
-                      misseryList.push(drink);
-                  }
+          for (let i = 2; i < keys.length; i++) {
+            if (neighbour[keys[i]] < 5) {
+              // Si es menor a 5, se buscara esa bebida en la lista de bebidas mas miserables
+              let temp = misseryList.find(elem => {
+                  return elem === keys[i];
+              })
+              // Si la bebida no esta en la lista de bebidas miserables, la agregara
+              if (!temp) {
+                  misseryList.push(keys[i]);
               }
-          })
+            } 
+          }
       });
       // Se duplica la lista de bebidas
       let leastMisseryList = [...keys];
@@ -176,7 +237,7 @@ function successFunction(data) {
           let deleteDrinkIndex = leastMisseryList.indexOf(elem);
           leastMisseryList.splice(deleteDrinkIndex, 1);
       });
-      // Retorna la lista de bebidas menos misrebales
+      // Retorna la lista de bebidas menos miserables
       //console.log(leastMisseryList);
       return leastMisseryList;
   }
@@ -199,14 +260,12 @@ function successFunction(data) {
             }
           }
         });
-
       }
       //console.log(groupValues);
       return groupValues
     }
 
     function getAveragePoints(array,initialList) {
-      //console.log(array);
       var grupo;
       for (let i = 0; i < initialList.length; i++) {
         if (initialList[i].Nombre == array[0][0][1]) {
@@ -214,7 +273,7 @@ function successFunction(data) {
         }
       }
       var newArray = [];
-      newArray.push(['grupo',grupo]);
+      //newArray.push(['grupo',grupo]);
       for (let i = 1; i < array[0].length; i++) {
         let newValue = 0;
         for (let i2 = 0; i2 < array.length; i2++) {
