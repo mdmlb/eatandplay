@@ -85,16 +85,51 @@ function successFunction(data) {
       });
     }
 
-    console.log(infoJuegos);
+    
+    //Parsear el valor de grupos a entero
+    
+    for (let i = 0; i < infoSnacks.length; i++) {
+      infoSnacks[i].Grupo = parseInt(infoSnacks[i].Grupo);
+    }
+    for (let i = 0; i < infoJuegos.length; i++) {
+      infoJuegos[i].Grupo = parseInt(infoJuegos[i].Grupo);
+    }
+    
+    //console.log(infoJuegos);
     //console.log(infoSnacks);
-
     //Logica
-    var infoGroups = setDataInGroups(infoJuegos);
-    var misseryList = getLeastMisseryList(infoGroups[1], indexJuegos);
-    getValuesFromLeastMisseryList(infoGroups[1], misseryList);
 
+  console.log(getRecommendationWithLeastMisseryMethod(2, 'juegos')); 
 
     //Funciones
+
+    function getRecommendationWithLeastMisseryMethod(grupo, tipo) { 
+      var infoGroups;
+      var index;
+      var genInfo;
+      switch (tipo) {
+        case 'juegos':
+          infoGroups = setDataInGroups(infoJuegos);
+          index = indexJuegos;
+          genInfo = infoJuegos;
+          break;
+      
+        case 'snacks':
+          infoGroups = setDataInGroups(infoSnacks);
+          index = indexSnacks;
+          genInfo = infoSnacks;
+          break;
+      }
+      //console.log(infoGroups);
+      var misseryListIndex = getLeastMisseryList(infoGroups[grupo], index);
+      console.log(misseryListIndex);
+      var misseryListValues = getValuesFromLeastMisseryList(infoGroups[grupo], misseryListIndex);
+      //console.log(misseryListIndex);
+      var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, genInfo);
+      //console.log(resultsMisseryValuesAverage);
+      return resultsMisseryValuesAverage
+    }
+
     function setDataInGroups(array) {
       var newArray = [];
       array.sort((a, b) => {
@@ -110,11 +145,12 @@ function successFunction(data) {
       for (let i = 0; i < array.length; i++) {
         newArray[array[i].Grupo].push(array[i]);
       }
-      console.log(newArray);
+      //console.log(newArray);
       return newArray
     }
     
     function getLeastMisseryList(list, keys) {
+      console.log(list,keys);
       // Se sacaran las bebidas mas "miserables"
       let misseryList = [];
       // Primero recorremos los vecinos de bebidas
@@ -141,32 +177,55 @@ function successFunction(data) {
           leastMisseryList.splice(deleteDrinkIndex, 1);
       });
       // Retorna la lista de bebidas menos misrebales
-      console.log(leastMisseryList);
+      //console.log(leastMisseryList);
       return leastMisseryList;
   }
 
     function getValuesFromLeastMisseryList(array, keys) {
+      //console.log(array);
+      //console.log(keys);
       var groupValues= [];
-      for (let i = 0; i < array[array.length - 1].Grupo + 2; i++) {
+      for (let i = 0; i < array.length ; i++) {
         groupValues[i] = [];
       }
-      console.log(groupValues);
+      //console.log(groupValues);
+      //console.log(groupValues);
       for (let i = 0; i < array.length; i++) {
         Object.entries(array[i]).forEach(([key, value]) => {
           for (let i2 = 0; i2 < keys.length; i2++) {
             if (keys[i2] == String(key)) {
-              console.log(key,value);
+              //console.log(key,value);
               groupValues[i].push([key,value]);
             }
-            
           }
         });
 
       }
-      console.log(groupValues);
+      //console.log(groupValues);
       return groupValues
     }
 
+    function getAveragePoints(array,initialList) {
+      //console.log(array);
+      var grupo;
+      for (let i = 0; i < initialList.length; i++) {
+        if (initialList[i].Nombre == array[0][0][1]) {
+          grupo = initialList[i].Grupo
+        }
+      }
+      var newArray = [];
+      newArray.push(['grupo',grupo]);
+      for (let i = 1; i < array[0].length; i++) {
+        let newValue = 0;
+        for (let i2 = 0; i2 < array.length; i2++) {
+          newValue += parseInt(array[i2][i][1]); 
+          //console.log(newValue);
+        }
+        newArray.push([array[0][i][0], (newValue/array.length)])
+      }
+      //console.log(newArray);
+      return newArray
+    }
 
   }
 }
