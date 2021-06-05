@@ -115,20 +115,29 @@ function successFunction(data) {
     })
     
     
-    
     //Funciones
 
     function recommendation(grupo, tipo, k) {
       var topValue = 3;
       //Con este bloque de codigo se consigue el top 3 de algo de lo que haya seleccionado
     var recommendation = getRecommendationWithLeastMisseryMethod(grupo, tipo);
-    //console.log(recommendation);
-    var topThree = recommendation.slice(recommendation.length-topValue,recommendation.length)
-    console.log(topThree);  
+    var topThree = recommendation.slice(recommendation.length-1,recommendation.length)
+    //console.log(topThree);  
+    document.querySelector('.recomendSnackContainer__result').innerHTML = topThree[0][0];
       //Con este bloque de codigo se consigue el top 3 de la otra base de datos
     var recommendation2 = getRecommendationOfOtherDB(grupo, tipo, k);
-    var topThree2 = recommendation2.slice(recommendation2.length-topValue,recommendation2.length)
+    var topThree2 = recommendation2.slice(recommendation2.length-topValue,recommendation2.length);
+    topThree2.sort((a, b) => {
+      if (a[1] < b[1]) { return 1 }
+      if (a[1] > b[1]) { return -1 }
+      return 0;
+    });
     console.log(topThree2);  
+    var showResults = document.querySelectorAll('.recomendGamesBySnacks__result');
+    document.querySelector('.recomendSnackContainerp__percent').innerHTML = (Math.round(topThree2[0][1]*10))+'%';
+      for (let i = 0; i < showResults.length; i++) {
+        showResults[i].innerHTML = topThree2[i][0];
+      }
     }
 
     function getRecommendationOfOtherDB(grupo, tipo, k) {
@@ -340,7 +349,6 @@ function successFunction(data) {
       for (let i = 0; i < array.length; i++) {
         newArray[array[i].Grupo].push(array[i]);
       }
-      //console.log(newArray);
       return newArray
     }
     
@@ -371,7 +379,6 @@ function successFunction(data) {
           leastMisseryList.splice(deleteDrinkIndex, 1);
       });
       // Retorna la lista de bebidas menos miserables
-      //console.log(leastMisseryList);
       return leastMisseryList;
   }
 
@@ -400,21 +407,15 @@ function successFunction(data) {
         }
       }
       var newArray = [];
-      //newArray.push(['grupo',grupo]);
-      for (let i = 1; i < array[0].length; i++) {
+      for (let i = 0; i < array[0].length; i++) {
         let newValue = 0;
         for (let i2 = 0; i2 < array.length; i2++) {
           newValue += parseInt(array[i2][i][1]); 
-          //console.log(newValue);
         }
         newArray.push([array[0][i][0], (newValue/array.length)])
       }
-      //console.log(newArray);
       return newArray
     }
-
   }
-
-  
 }
 
