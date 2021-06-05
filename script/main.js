@@ -101,54 +101,88 @@ function successFunction(data) {
 
     //Logica
 
-    //Con este bloque de codigo se consigue el top 3 de algo
-    /* var recommendation = getRecommendationWithLeastMisseryMethod(18, 'snacks');
-    //console.log(recommendation);
-    var topThree = recommendation.slice(recommendation.length-3,recommendation.length)
-    console.log(topThree);  */
-    
-    console.log(setGroupsDataInArrays('juegos'));
-    var test1 = setGroupsDataInArrays('juegos');
-    //magnitud(test1[1]);
-    //productoPunto(test1[0], test1[1])
-    for (let i = 0; i < test1.length; i++) {
-      console.log(similCoseno(test1[1], test1[i]));
-    }
-    
+    //Metodo final, recibe (Número del grupo a evaluar, tipo de comida que eligió el grupo que puede ser: 'snacks' o 'juegos', el valor del vecindario (K))
 
+    recommendation(1,'juegos',3)
+
+    
     //Funciones
 
-    function similCoseno(grupo1, grupo2) {
-      let result = 0;
-      result = (productoPunto(grupo1, grupo2)) / ((magnitud(grupo1))*(magnitud(grupo2)));
-      //console.log(result);
-      return result;
+    function recommendation(grupo, tipo, k) {
+      var topValue = 3;
+      //Con este bloque de codigo se consigue el top 3 de algo de lo que haya seleccionado
+    var recommendation = getRecommendationWithLeastMisseryMethod(grupo, tipo);
+    var topThree = recommendation.slice(recommendation.length-topValue,recommendation.length)
+    console.log(topThree);  
+      //Con este bloque de codigo se consigue el top 3 de la otra base de datos
+    var recommendation2 = getRecommendationOfOtherDB(grupo, tipo, k);
+    var topThree2 = recommendation2.slice(recommendation2.length-topValue,recommendation2.length)
+    console.log(topThree2);  
     }
 
-    function productoPunto(grupo1, grupo2) {
-      var newValue = 0;
-      //console.log(grupo1, grupo2);
-      for (let i = 2; i < grupo1.length; i++) {
-        //console.log(grupo1[i][1]*grupo2[i][1]);
-        newValue += (grupo1[i][1]*grupo2[i][1]);
+    function getRecommendationOfOtherDB(grupo, tipo, k) {
+      var infoDB;
+      var infoDB2;
+      switch (tipo) {
+        case 'juegos':
+          infoDB = infoJuegos;
+          infoDB2 = infoSnacks;
+          break;
+      
+        case 'snacks':
+          infoDB = infoSnacks;
+          infoDB2 = infoJuegos;
+          break;
       }
-      //console.log(newValue);
-      return newValue
+      var neighbourhood = getNeighbourhood(grupo,infoDB,k);
+    var test = getInfoOfOtherDB(neighbourhood, infoDB2);
+    return getAveragePointsOfOtherDB(test)
     }
 
-    function magnitud(grupo) {
-      //console.log(grupo);
-      var newValue = 0;
-      for (let i = 2; i < grupo.length; i++) {
-        //console.log(grupo[i]);
-        let newVal = (grupo[i][1]*grupo[i][1]);
-        newValue+= newVal;
+    function getAveragePointsOfOtherDB(firstArray) {
+      var newArray = [];
+      var array = transformGroupObjectsToGroupArrays(firstArray);
+      for (let i = 1; i < array[array.length-1].length-1; i++) {
+        newArray[i] = [];
       }
-      //console.log(Math.sqrt(newValue));
-      return Math.sqrt(newValue);
+      for (let i = 2; i < array[array.length-1].length; i++) {
+        newArray[i-1].push(array[array.length-1][i][0])
+      }
+      let finalResult = getAverageOfGroup(array);
+      finalResult.shift();
+      finalResult.shift();
+      finalResult.sort((a, b) => {
+        if (a[1] < b[1]) { return -1 }
+        if (a[1] > b[1]) { return 1 }
+        return 0;
+      });
+      return finalResult
     }
 
-    function setGroupsDataInArrays(tipo) {
+    function getInfoOfOtherDB(array,db) {
+      let newArray = [];
+      for (let i = 0; i < array.length; i++) {
+        for (let i2 = 0; i2 < db.length; i2++) {
+          if (db[i2].Grupo == array[i][0]) {
+            newArray.push(db[i2]);
+          } 
+        }
+      }
+      return newArray
+    }
+
+    function getNeighbourhood(grupo, tipo, k) {
+      var neighbourhoodOfGroups = getSimilCosenoValuesOfGroup(grupo, tipo); 
+    return getNeighbourhoodOfGroup(neighbourhoodOfGroups, k);
+    }
+
+    function getNeighbourhoodOfGroup(array, k) {
+      array.pop();
+      let result = array.slice(array.length-k, array.length)
+      return result
+    }
+
+    function getSimilCosenoValuesOfGroup(grupo, tipo) {
       var infoDB;
       switch (tipo) {
         case 'juegos':
@@ -159,7 +193,44 @@ function successFunction(data) {
           infoDB = infoSnacks;
           break;
       }
-      var infoGroupsObjects = setDataInGroups(infoDB);
+      var test1 = setGroupsDataInArrays(tipo);
+    var similCosenoValues = [];
+    for (let i = 0; i < test1.length; i++) {
+      similCosenoValues.push([test1[i][1][1],similCoseno(test1[grupo-1], test1[i])])
+    }
+    similCosenoValues.sort((a, b) => {
+      if (a[1] < b[1]) { return -1 }
+      if (a[1] > b[1]) { return 1 }
+      return 0;
+    });
+    return similCosenoValues
+    }
+
+    function similCoseno(grupo1, grupo2) {
+      let result = 0;
+      result = (productoPunto(grupo1, grupo2)) / ((magnitud(grupo1))*(magnitud(grupo2)));
+      return result;
+    }
+
+    function productoPunto(grupo1, grupo2) {
+      var newValue = 0;
+      for (let i = 2; i < grupo1.length; i++) {
+        newValue += (grupo1[i][1]*grupo2[i][1]);
+      }
+      return newValue
+    }
+
+    function magnitud(grupo) {
+      var newValue = 0;
+      for (let i = 2; i < grupo.length; i++) {
+        let newVal = (grupo[i][1]*grupo[i][1]);
+        newValue+= newVal;
+      }
+      return Math.sqrt(newValue);
+    }
+
+    function setGroupsDataInArrays(tipo) {
+      var infoGroupsObjects = setDataInGroups(tipo);
       var infoGroupsArrays = [];
     for (let i = 1; i < infoGroupsObjects.length; i++) {
       let item = transformGroupObjectsToGroupArrays(infoGroupsObjects[i]);
@@ -169,25 +240,19 @@ function successFunction(data) {
     }
 
     function transformGroupObjectsToGroupArrays(array) {
-      //console.log(array);
       let newArray = [];
       for (let i = 1; i < array.length + 1; i++) {
         newArray[i] = [];
       }
       for (let i = 0; i < array.length; i++) {
-        //console.log(array[i]);
         Object.entries(array[i]).forEach(([key, value]) => {
-          //console.log(newArray);
-          //console.log(newArray[array[i].Grupo]);
           newArray[i+1].push([key,value])
         });
       }
-      //console.log(newArray);
       return newArray
     }
 
     function getAverageOfGroup(array) {
-      //console.log(array);
       let newArray = [];
       for (let i = 1; i < array[array.length-1].length ; i++) {
         newArray[i] = [];
@@ -198,14 +263,12 @@ function successFunction(data) {
         newArray[i].push(array[array.length-1][i][0]);
         
         for (let i2 = 1; i2 < array.length; i2++) {
-          //console.log(array[i2][i][1]);
           newValue+= parseInt(array[i2][i][1]);        
         }   
         newArray[i].push(newValue/(array.length-1));
       }
       
       newArray[1].push("Grupo", array[array.length-1][1][1])
-      //console.log(newArray);
       return newArray
     }
 
@@ -226,13 +289,9 @@ function successFunction(data) {
           genInfo = infoSnacks;
           break;
       }
-      console.log(infoGroups);
       var misseryListIndex = getLeastMisseryList(infoGroups[grupo], index);
-      console.log(misseryListIndex);
       var misseryListValues = getValuesFromLeastMisseryList(infoGroups[grupo], misseryListIndex);
-      console.log(misseryListValues);
       var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, genInfo);
-      //console.log(resultsMisseryValuesAverage);
       var result = [];
       result.push(resultsMisseryValuesAverage[0]);
       resultsMisseryValuesAverage.shift();
@@ -257,14 +316,12 @@ function successFunction(data) {
       });
 
       for (let i = 0; i < array.length; i++) {
-        //console.log(array[i].Grupo);
         if (array[i+1]) {
           if (array[i].Grupo !== array[i+1].Grupo) {
             grupo++;
           }
         }
       }
-      //console.log(grupo);
 
        for (let i = 1; i < grupo + 1; i++) {
         newArray[i] = [];
@@ -278,7 +335,6 @@ function successFunction(data) {
     }
     
     function getLeastMisseryList(list, keys) {
-      //console.log(list,keys);
       // Se sacaran las bebidas mas "miserables"
       let misseryList = [];
       // Primero recorremos los vecinos de bebidas
@@ -310,25 +366,19 @@ function successFunction(data) {
   }
 
     function getValuesFromLeastMisseryList(array, keys) {
-      //console.log(array);
-      //console.log(keys);
       var groupValues= [];
       for (let i = 0; i < array.length ; i++) {
         groupValues[i] = [];
       }
-      //console.log(groupValues);
-      //console.log(groupValues);
       for (let i = 0; i < array.length; i++) {
         Object.entries(array[i]).forEach(([key, value]) => {
           for (let i2 = 0; i2 < keys.length; i2++) {
             if (keys[i2] == String(key)) {
-              //console.log(key,value);
               groupValues[i].push([key,value]);
             }
           }
         });
       }
-      //console.log(groupValues);
       return groupValues
     }
 
