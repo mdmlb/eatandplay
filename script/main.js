@@ -122,8 +122,8 @@ function successFunction(data) {
       //Con este bloque de codigo se consigue el top 3 de algo de lo que haya seleccionado
     var recommendation = getRecommendationWithLeastMisseryMethod(grupo, tipo);
     var topThree = recommendation.slice(recommendation.length-1,recommendation.length)
-    //console.log(topThree);  
-    document.querySelector('.recomendSnackContainer__result').innerHTML = topThree[0][0];
+    console.log(topThree);  
+    document.querySelector('.resultt').innerHTML = topThree[0][0];
       //Con este bloque de codigo se consigue el top 3 de la otra base de datos
     var recommendation2 = getRecommendationOfOtherDB(grupo, tipo, k);
     var topThree2 = recommendation2.slice(recommendation2.length-topValue,recommendation2.length);
@@ -133,8 +133,8 @@ function successFunction(data) {
       return 0;
     });
     console.log(topThree2);  
-    var showResults = document.querySelectorAll('.recomendGamesBySnacks__result');
-    document.querySelector('.recomendSnackContainerp__percent').innerHTML = (Math.round(topThree2[0][1]*10))+'%';
+    var showResults = document.querySelectorAll('.recommendResults');
+    document.querySelector('.resultPercent').innerHTML = (Math.round(topThree2[0][1]*10))+'%';
       for (let i = 0; i < showResults.length; i++) {
         showResults[i].innerHTML = topThree2[i][0];
       }
@@ -322,7 +322,13 @@ function successFunction(data) {
       for (let i = 0; i < resultsMisseryValuesAverage.length; i++) {
         result.push(resultsMisseryValuesAverage[i]); 
       }
-      return result
+      let finalArray = [];
+      for (let i = 0; i < result.length; i++) {
+        if (result[i][0] !== 'Grupo') {
+          finalArray.push(result[i])
+        }
+      }
+      return finalArray
     }
 
     function setDataInGroups(array) {
