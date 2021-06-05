@@ -1,6 +1,6 @@
 //Cargar el archivo
 $.ajax({
-  url: "/data/db_juegos.csv",
+  url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRWCnovTNw6eFV8zbzA92dDBZkme3TX6x1k2QSpqfnOtiFgPt4Amu4AbntlJcd_ewLXkG-DMLzgrXqL/pub?output=csv",
   dataType: "text"
 }).done(successFunction);
 
@@ -42,7 +42,7 @@ function successFunction(data) {
   }
 
   $.ajax({
-    url: "/data/db_snacks.csv",
+    url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnBq9hqtML0gBxX-cYRyWI6rZ1KLAA0PKRzMeVQAG6Khq0ZRIGlYcpg9QFNQBsVAHXfjRs9_isOSCe/pub?output=csv",
     dataType: "text"
   }).done(setBebidasInfo);
 
@@ -103,8 +103,18 @@ function successFunction(data) {
 
     //Metodo final, recibe (Número del grupo a evaluar, tipo de comida que eligió el grupo que puede ser: 'snacks' o 'juegos', el valor del vecindario (K))
 
-    recommendation(1,'juegos',3)
-
+    //Interacciones con el html
+    var btn;
+    btn = document.querySelector('.searchBtn');
+    
+    btn.addEventListener('click',() =>{
+      let grupo = document.querySelector('.groupInput').value;
+      let tipo = document.querySelector('#tipo').innerText;
+      let Kvalue = 5;
+      recommendation(grupo, tipo, Kvalue);
+    })
+    
+    
     
     //Funciones
 
@@ -112,6 +122,7 @@ function successFunction(data) {
       var topValue = 3;
       //Con este bloque de codigo se consigue el top 3 de algo de lo que haya seleccionado
     var recommendation = getRecommendationWithLeastMisseryMethod(grupo, tipo);
+    //console.log(recommendation);
     var topThree = recommendation.slice(recommendation.length-topValue,recommendation.length)
     console.log(topThree);  
       //Con este bloque de codigo se consigue el top 3 de la otra base de datos
@@ -294,7 +305,6 @@ function successFunction(data) {
       var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, genInfo);
       var result = [];
       result.push(resultsMisseryValuesAverage[0]);
-      resultsMisseryValuesAverage.shift();
       resultsMisseryValuesAverage.sort((a, b) => {
         if (a[1] < b[1]) { return -1 }
         if (a[1] > b[1]) { return 1 }
@@ -404,4 +414,7 @@ function successFunction(data) {
     }
 
   }
+
+  
 }
+
