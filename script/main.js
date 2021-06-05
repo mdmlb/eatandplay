@@ -122,7 +122,7 @@ function successFunction(data) {
       //Con este bloque de codigo se consigue el top 3 de algo de lo que haya seleccionado
     var recommendation = getRecommendationWithLeastMisseryMethod(grupo, tipo);
     var topThree = recommendation.slice(recommendation.length-1,recommendation.length)
-    console.log(topThree);  
+    //console.log(topThree);  
     document.querySelector('.resultt').innerHTML = topThree[0][0];
       //Con este bloque de codigo se consigue el top 3 de la otra base de datos
     var recommendation2 = getRecommendationOfOtherDB(grupo, tipo, k);
@@ -132,7 +132,7 @@ function successFunction(data) {
       if (a[1] > b[1]) { return -1 }
       return 0;
     });
-    console.log(topThree2);  
+    //console.log(topThree2);  
     var showResults = document.querySelectorAll('.recommendResults');
     document.querySelector('.resultPercent').innerHTML = (Math.round(topThree2[0][1]*10))+'%';
       for (let i = 0; i < showResults.length; i++) {
