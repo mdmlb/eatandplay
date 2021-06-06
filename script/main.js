@@ -95,8 +95,8 @@ function successFunction(data) {
       infoJuegos[i].Grupo = parseInt(infoJuegos[i].Grupo);
     }
     
-    //console.log(infoJuegos);
-    //console.log(infoSnacks);
+    console.log(infoJuegos);
+    console.log(infoSnacks);
 
 
     //Logica
@@ -138,6 +138,87 @@ function successFunction(data) {
       for (let i = 0; i < showResults.length; i++) {
         showResults[i].innerHTML = topThree2[i][0];
       }
+
+      //Intento para comprobar los resultados:
+      var btnSpecificResult = document.querySelector('.showSpecificResultsBtn');
+      btnSpecificResult.addEventListener('click', ()=>{
+        var searchDB;
+        var searchDBop;
+        var index;
+        var indexOp;
+        switch (tipo) {
+          case 'juegos':
+            searchDB = setDataInGroups(infoJuegos)
+            searchDBop = setDataInGroups(infoSnacks);
+            index = indexJuegos;
+            indexOp = indexSnacks;
+            break;
+            
+            case 'snacks':
+              searchDB = setDataInGroups(infoSnacks)
+              searchDBop = setDataInGroups(infoJuegos);
+              index = indexSnacks;
+              indexOp = indexJuegos;
+              break;
+            }
+            //console.log(searchDBop[grupo]);
+            var comparationArray = [];
+            
+            for (let i = 0; i < topThree2.length; i++) {
+              comparationArray[i] = [];
+              comparationArray[i].push(topThree2[i][0], 0);
+            }
+            
+            
+            for (let i = 0; i < searchDBop[grupo].length; i++) {
+              Object.entries(searchDBop[grupo][i]).forEach(([key, value]) => {
+                for (let i2 = 0; i2 < topThree2.length; i2++) {
+                  if (key == topThree2[i2][0]) {
+                    comparationArray[i2][1] += (parseInt(value)/searchDBop[grupo].length);
+                  }  
+                }
+              });
+            } 
+            var trueValues = getMisseryValues(searchDBop, grupo, indexOp, index);
+            //console.log(trueValues);
+            var topThree3 = trueValues.slice(trueValues.length-topValue,trueValues.length);
+            topThree3.sort((a, b) => {
+              if (a[1] < b[1]) { return 1 }
+              if (a[1] > b[1]) { return -1 }
+              return 0;
+            });
+              console.log('Grupo de personas',searchDBop[grupo]);
+            console.log('Predicción nuestra',topThree2);
+            console.log('Top 3 real',topThree3);
+          console.log('Valores reales de nuestra predicción',comparationArray);  
+          document.querySelector('.verificationResults').innerHTML = `La predicción es correcta en un ${getVerificationValue(topThree2, topThree3, comparationArray)}%`
+      });
+    }
+
+    function getVerificationValue(arrayPredict, arrayTop3Real, arrayPredictRealValues) {
+      var verifValue = 0;
+      var firstCount = 0;
+      var secondCount = 0;
+      for (let i = 0; i < arrayTop3Real.length; i++) {
+        for (let i2 = 0; i2 < arrayPredict.length; i2++) {
+          if (arrayTop3Real[i][0] == arrayPredict[i2][0]) {
+            firstCount++;
+          }
+        }
+      }
+      verifValue+= ruleOf3(firstCount, 3);
+      for (let i = 0; i < arrayPredict.length; i++) {
+          if (arrayPredict[i][1]-1.5 < arrayPredictRealValues[i][1] && arrayPredict[i][1]+1.5 > arrayPredictRealValues[i][1]) {
+            secondCount++;
+        }
+      }
+      verifValue+= ruleOf3(secondCount, 3);
+      return Math.round(verifValue); 
+    }
+
+    function ruleOf3(value, total) {
+      let result = (value*50)/(total)
+      return result
     }
 
     function getRecommendationOfOtherDB(grupo, tipo, k) {
@@ -309,9 +390,14 @@ function successFunction(data) {
           genInfo = infoSnacks;
           break;
       }
+      let resultFinal = getMisseryValues(infoGroups, grupo, index, genInfo);
+      return resultFinal
+    }
+
+    function getMisseryValues(infoGroups, grupo, index, opIndex) {
       var misseryListIndex = getLeastMisseryList(infoGroups[grupo], index);
       var misseryListValues = getValuesFromLeastMisseryList(infoGroups[grupo], misseryListIndex);
-      var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, genInfo);
+      var resultsMisseryValuesAverage = getAveragePoints(misseryListValues, opIndex);
       var result = [];
       result.push(resultsMisseryValuesAverage[0]);
       resultsMisseryValuesAverage.sort((a, b) => {
@@ -396,7 +482,9 @@ function successFunction(data) {
       for (let i = 0; i < array.length; i++) {
         Object.entries(array[i]).forEach(([key, value]) => {
           for (let i2 = 0; i2 < keys.length; i2++) {
+            //console.log(keys[i2], String(key));
             if (keys[i2] == String(key)) {
+              //console.log([key,value]);
               groupValues[i].push([key,value]);
             }
           }
